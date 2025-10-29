@@ -80,3 +80,31 @@ export const getMe = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, profilePicture } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update fields
+    if (name) user.name = name;
+    if (profilePicture !== undefined) user.profilePicture = profilePicture;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

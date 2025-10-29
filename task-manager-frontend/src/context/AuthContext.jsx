@@ -59,6 +59,9 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: message };
     }
   };
+  const updateUser = (updatedUserData) => {
+  setUser(prev => ({ ...prev, ...updatedUserData }));
+  };
 
   const logout = () => {
     authAPI.logout();
@@ -73,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
+    updateUser,
     isAuthenticated: !!user,
   };
 

@@ -19,11 +19,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please add a password'],
       minlength: 6,
-      select: false, // Don't return password by default
+      select: false,
+    },
+    profilePicture: {
+      type: String,
+      default: null, // Will store base64 image or URL
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

@@ -34,8 +34,18 @@ const TaskForm = ({ task, onSubmit, onCancel }) => {
     onSubmit(formData);
   };
 
+  // Close modal when clicking outside
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onCancel();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 fade-in">
+    <div 
+      className="fixed inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center p-4 z-50 fade-in backdrop-blur-lg"
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <h2 className="text-2xl font-bold text-gray-800">
