@@ -16,8 +16,27 @@ connectDB();
 // Initialize Express app
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware// Middleware
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://task-manager-app-zh43.onrender.com'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS Error: This origin is not allowed'));
+    }
+  },
+  credentials: true // <-- This is critical. It allows cookies/auth tokens.
+}));
+// --- END CORS FIX ---
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
