@@ -13,6 +13,7 @@ const Dashboard = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+  const [searchQuery, setSearchQuery] = useState(''); // New state
 
   useEffect(() => {
     fetchTasks();
@@ -20,7 +21,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     filterAndSortTasks();
-  }, [tasks, filterStatus, sortBy]);
+  }, [tasks, filterStatus, sortBy, searchQuery]); // Add searchQuery dependency
 
   const fetchTasks = async () => {
     try {
@@ -36,6 +37,14 @@ const Dashboard = () => {
 
   const filterAndSortTasks = () => {
     let filtered = [...tasks];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((task) =>
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
 
     // Filter by status
     if (filterStatus !== 'all') {
@@ -62,6 +71,10 @@ const Dashboard = () => {
     });
 
     setFilteredTasks(filtered);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
   };
 
   const handleCreateTask = async (taskData) => {
@@ -111,30 +124,30 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading your tasks...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">Loading your tasks...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <Navbar onSearch={handleSearch} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <TaskStats tasks={tasks} />
 
         {/* Filters and Actions */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full sm:w-auto">
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition"
               >
                 <option value="all">All Tasks</option>
                 <option value="todo">To Do</option>
@@ -145,7 +158,7 @@ const Dashboard = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -165,18 +178,25 @@ const Dashboard = () => {
             </button>
           </div>
         </div>
+        
 
         {/* Tasks Grid */}
         {filteredTasks.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">No tasks found</h3>
-            <p className="text-gray-500 mb-6">
-              {filterStatus === 'all'
+            <div className="text-6xl mb-4">
+              {searchQuery ? '🔍' : '📝'}
+            </div>
+            <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+              {searchQuery ? 'No tasks found' : 'No tasks yet'}
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              {searchQuery
+                ? `No tasks match "${searchQuery}"`
+                : filterStatus === 'all'
                 ? 'Create your first task to get started!'
                 : `No tasks with status "${filterStatus}"`}
             </p>
-            {filterStatus === 'all' && (
+            {filterStatus === 'all' && !searchQuery && (
               <button
                 onClick={() => setShowForm(true)}
                 className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
@@ -188,12 +208,7 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTasks.map((task) => (
-              <TaskCard
-                key={task._id}
-                task={task}
-                onEdit={handleEdit}
-                onDelete={handleDeleteTask}
-              />
+              <TaskCard key={task._id} task={task} onEdit={handleEdit} onDelete={handleDeleteTask} />
             ))}
           </div>
         )}

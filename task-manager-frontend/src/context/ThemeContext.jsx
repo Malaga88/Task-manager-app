@@ -11,29 +11,30 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Initialize from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === 'dark';
+  });
 
   useEffect(() => {
-    // Check local storage for theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
+    // Apply theme on mount and when darkMode changes
+    const root = document.documentElement;
+    
+     
+    if (darkMode) {
+      console.log('ADDING .dark class'); // <-- ADD THIS LINE
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      console.log('REMOVING .dark class'); // <-- ADD THIS LINE
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-  }, []);
+  }, [darkMode]);
 
   const toggleDarkMode = () => {
-    setDarkMode((prev) => {
-      const newMode = !prev;
-      if (newMode) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-      return newMode;
-    });
+    setDarkMode(prev => !prev);
   };
 
   return (

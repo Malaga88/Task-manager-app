@@ -18,12 +18,12 @@ const TaskStats = ({ tasks }) => {
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-200"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-200"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">{stat.label}</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-gray-100">{stat.value}</p>
             </div>
             <div className={`text-4xl bg-gradient-to-br ${stat.color} w-14 h-14 rounded-xl flex items-center justify-center shadow-lg`}>
               {stat.icon}
