@@ -2,12 +2,15 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+console.log('API URL:', API_URL); // For debugging
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: false, // Set to true if you need cookies
 });
 
 // Add token to requests if it exists
@@ -20,6 +23,20 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle response errors globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
@@ -56,6 +73,17 @@ export const authAPI = {
 
   getMe: async () => {
     const response = await api.get('/auth/me');
+    return response.data;
+  },
+
+  updateProfile: async (profileData) => {
+    const response = await api.put('/auth/profile', profileData);
+    
+    // Update local storage with new user data
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const updatedUser = { ...currentUser, ...response.data };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
     return response.data;
   },
 };

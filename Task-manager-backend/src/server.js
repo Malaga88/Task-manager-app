@@ -20,7 +20,7 @@ const app = express();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://task-manager-app-zh43.onrender.com'
+  'https://task-manager-app-s59f.vercel.app'
 ];
 
 app.use(cors({
@@ -31,9 +31,8 @@ app.use(cors({
       callback(new Error('CORS Error: This origin is not allowed'));
     }
   },
-  credentials: true // <-- This is critical. It allows cookies/auth tokens.
+  credentials: true 
 }));
-// --- END CORS FIX ---
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
